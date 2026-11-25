@@ -36,6 +36,13 @@ export type Suggestion = {
   created_at: string
 }
 
+export type Leftover = {
+  id: string
+  item: string
+  days_old: number
+  created_at: string
+}
+
 export type GuardrailNote = {
   redacted?: string[]
   outputRedacted?: string[]

@@ -78,6 +78,17 @@ create table if not exists suggestions (
 );
 create index if not exists suggestions_user_id_idx on suggestions (user_id);
 
+-- Leftover Remix: each person's own fridge.
+create table if not exists leftovers (
+  id uuid primary key default gen_random_uuid(),
+  user_id text not null default current_setting('app.user_id', true)
+    references "user"("id") on delete cascade,
+  item text not null,
+  days_old int not null check (days_old >= 0),
+  created_at timestamptz not null default now()
+);
+create index if not exists leftovers_user_id_idx on leftovers (user_id);
+
 -- 3. A low-power role the app switches to for every data query.
 --    Table owners skip row rules, so the app must NOT query as the owner.
 do $$
@@ -90,6 +101,7 @@ $$;
 grant app_user to current_user;
 grant usage on schema public to app_user;
 grant select, insert, update, delete on suggestions to app_user;
+grant select, insert, update, delete on leftovers to app_user;
 
 -- 4. The row rule: you only ever see and change your own rows.
 alter table suggestions enable row level security;
@@ -99,13 +111,21 @@ create policy "own rows only"
   to app_user
   using (user_id = current_setting('app.user_id', true))
   with check (user_id = current_setting('app.user_id', true));
+
+alter table leftovers enable row level security;
+drop policy if exists "own rows only" on leftovers;
+create policy "own rows only"
+  on leftovers for all
+  to app_user
+  using (user_id = current_setting('app.user_id', true))
+  with check (user_id = current_setting('app.user_id', true));
 `
 
 const client = new pg.Client({ connectionString: url })
 try {
   await client.connect()
   await client.query(sql)
-  console.log("Database ready: sign-in tables, suggestions table, row-level security on.")
+  console.log("Database ready: sign-in tables, suggestions and leftovers tables, row-level security on.")
 } catch (error) {
   console.error("Database setup failed:", error.message)
   process.exit(1)

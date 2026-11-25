@@ -1,6 +1,8 @@
 import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
+  // The "Load sample fridge" button reads this file on the server, so ship it with the route.
+  outputFileTracingIncludes: { "/api/leftovers": ["./data/leftover_remix.csv"] },
   async headers() {
     return [
       {

@@ -6,7 +6,7 @@ const heading = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-head
 const body = Nunito_Sans({ subsets: ["latin"], variable: "--font-body" })
 
 export const metadata: Metadata = {
-  title: "Study Plan Coach · Ship AI Starter",
+  title: "Leftover Remix · Ship AI Starter",
   description:
     "A real AI app built the safe way: sign-in, a locked-down database, one AI feature, and a guardrail. From 3percentclub x Block Convey.",
 }

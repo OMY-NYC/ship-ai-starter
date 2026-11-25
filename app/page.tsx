@@ -12,11 +12,11 @@ export default async function HomePage() {
       <section className="flex flex-1 flex-col gap-5">
         <p className="text-sm font-bold uppercase tracking-widest text-primary">Ship AI Starter</p>
         <h1 className="font-display text-4xl font-extrabold leading-tight text-balance md:text-5xl">
-          Study Plan Coach
+          Leftover Remix
         </h1>
         <p className="max-w-md text-lg leading-relaxed text-pretty">
-          Type a goal, get a 3-step plan, saved to your account. Small app, real safety: every layer
-          is the kind you would ship to real users.
+          List what's left in your fridge after Thanksgiving and get one new meal in 3 steps. Anything
+          too old gets tossed, not cooked. Small app, real safety: every layer is the kind you would ship.
         </p>
         <LayerList />
         <p className="text-sm text-muted">Use made-up details only. Assume anything you type is stored.</p>

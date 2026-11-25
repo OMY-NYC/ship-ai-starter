@@ -9,6 +9,7 @@
     "start": "next start",
     "db:setup": "node scripts/setup-db.mjs",
     "test:rls": "node scripts/rls-test.mjs",
+    "test:guardrail": "node scripts/guardrail-test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

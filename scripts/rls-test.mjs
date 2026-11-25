@@ -79,6 +79,40 @@ try {
 
   const nobody = await asUser(null, "select count(*)::int as n from suggestions")
   check("No signed-in user sees nothing", nobody.rows[0].n === 0)
+
+  // Leftover Remix: the same rules for each person's fridge.
+  const food = await asUser(
+    A,
+    "insert into leftovers (item, days_old) values ('rotisserie turkey', 2) returning id",
+  )
+  const foodId = food.rows[0].id
+  check("User A can add a leftover", Boolean(foodId))
+
+  const aFridge = await asUser(A, "select count(*)::int as n from leftovers")
+  check("User A sees their own fridge", aFridge.rows[0].n === 1)
+
+  const bFridge = await asUser(B, "select count(*)::int as n from leftovers")
+  check("User B sees zero of A's leftovers", bFridge.rows[0].n === 0)
+
+  const bFoodById = await asUser(B, "select * from leftovers where id = $1", [foodId])
+  check("User B cannot fetch A's leftover even with its exact id", bFoodById.rowCount === 0)
+
+  const bFoodUpdate = await asUser(B, "update leftovers set days_old = 0 where id = $1", [foodId])
+  check("User B cannot change how old A's leftover is", bFoodUpdate.rowCount === 0)
+
+  const bFoodDelete = await asUser(B, "delete from leftovers where id = $1", [foodId])
+  check("User B cannot delete A's leftover", bFoodDelete.rowCount === 0)
+
+  let foodSpoofBlocked = false
+  try {
+    await asUser(B, "insert into leftovers (user_id, item, days_old) values ($1, 'gravy', 8)", [A])
+  } catch {
+    foodSpoofBlocked = true
+  }
+  check("User B cannot put a leftover in A's fridge", foodSpoofBlocked)
+
+  const nobodyFridge = await asUser(null, "select count(*)::int as n from leftovers")
+  check("No signed-in user sees no leftovers", nobodyFridge.rows[0].n === 0)
 } catch (error) {
   console.error("Test crashed:", error.message)
   failures++
